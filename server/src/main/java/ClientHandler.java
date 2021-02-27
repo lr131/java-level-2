@@ -1,6 +1,4 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -10,10 +8,15 @@ public class ClientHandler implements Runnable {
     
     private Socket socket;
     private Server server;
-    private DataInputStream in;
-    private DataOutputStream out;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
     private boolean running;
     private String nickName;
+
+
+    public String getNickName() {
+        return nickName;
+    }
     private static int cnt = 0;
     
     public ClientHandler(Socket socket, Server server) {
@@ -27,15 +30,22 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         try {
-            out = new DataOutputStream(socket.getOutputStream());
-            in = new DataInputStream(socket.getInputStream());
+            in = new ObjectInputStream(socket.getInputStream());
+            out = new ObjectOutputStream(socket.getOutputStream());
             System.out.println("[DEBUG] client start processing");
             while (running) {
-                String message = in.readUTF();
-                if (message.equals("/quit")) {
-                    out.writeUTF(message);
+                MessageDTO msgObj = (MessageDTO) in.readObject();
+                MessageDTO message = new MessageDTO(
+                    nickName,
+                    msgObj.getNickTo(),
+                    msgObj.getMsg()
+                );
+                if (message.getMsg().equals("/quit")) {
+                    out.writeObject(message);
+                } else if (!message.getNickTo().isEmpty()) {
+                    server.sendPrivateMessage(message);
                 } else {
-                    server.broadCastMessage("[" + nickName + "]: " + message);
+                    server.broadCastMessage(message);
                 }
                 System.out.println("[DEBUG] message from client: " + message);
             }
@@ -45,8 +55,8 @@ public class ClientHandler implements Runnable {
         }
     }
     
-    public void sendMessage(String message) throws IOException {
-        out.writeUTF(message);
+    public void sendMessage(MessageDTO message) throws IOException {
+        out.writeObject(message);
         out.flush();
     }
 }

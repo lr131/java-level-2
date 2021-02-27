@@ -27,7 +27,7 @@ public class Server {
             System.err.println("Server was broke");
         }
     }
-    
+
     public void addClient(ClientHandler clientHandler) {
         clients.add(clientHandler);
         System.out.println("[DEBUG] Client added to broadcast queue.");
@@ -38,16 +38,26 @@ public class Server {
         System.out.println("[DEBUG] Client removed from broadcast queue.");
     }
 
-    public void broadCastMessage(String message) throws IOException {
+    public void broadCastMessage(MessageDTO message) throws IOException {
         for (ClientHandler client: clients) {
             client.sendMessage(message);
         }
     }
-    
-    public void sendPrivateMessage(String nickName, String message) {
-        //TODO
+
+    public void sendPrivateMessage(MessageDTO message) throws IOException {
+        for (ClientHandler client: clients) {
+            if (message.getNickTo().equals(client.getNickName())
+                || message.getNickFrom().equals(client.getNickName())) {
+                client.sendMessage(message);
+            }
+        }
+        System.out.println("[DEBUG] Client "
+            + message.getNickFrom()
+            + " send private message to "
+            + message.getNickTo()
+        );
     }
-            
+
     public static void main(String[] args) {
         int port = -1;
         if (args != null && args.length == 1) {
