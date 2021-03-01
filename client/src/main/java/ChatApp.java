@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -12,20 +13,32 @@ import java.io.IOException;
  * @author Kristina Retivykh
  */
 public class ChatApp extends Application {
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        Network network = Network.getInstance();
+    static Stage primaryStage;
+
+    void setChat(Stage stage, Network network) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("chat.fxml"));
-        primaryStage.setScene(new Scene(root));
-        primaryStage.setTitle("Chat");
-        primaryStage.setResizable(false);
-        primaryStage.show();
-        primaryStage.setOnCloseRequest(request -> {
+        stage.setScene(new Scene(root));
+
+        stage.setTitle("login");
+        stage.setResizable(false);
+        stage.show();
+        stage.setOnCloseRequest(request -> {
             try {
                 network.writeMessage(new MessageDTO("", "/quit"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        Parent chat = FXMLLoader.load(getClass().getResource("chat.fxml"));
+        Parent login = FXMLLoader.load(getClass().getResource("login.fxml"));
+        MainController mainController = new MainController(primaryStage);
+        mainController.add("login", login);
+        mainController.add("chat", chat);
+        mainController.activate("login");
+
     }
 }
