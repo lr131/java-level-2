@@ -2,7 +2,7 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
     private final User author;
-    private final String nickTo;
+    private final String recipient;
     private final String msg;
     private Boolean state = null;
 
@@ -14,35 +14,35 @@ public class Message implements Serializable {
         return this.author;
     }
 
-    public String getNickTo() {
-        return nickTo;
+    public String getRecipient() {
+        return recipient;
     }
 
     public String getMsg() {
         return msg;
     }
 
-    public Message(User author, String nickTo, String msg) {
+    public Message(User author, String recipient, String msg) {
         this.author = author;
-        this.nickTo = nickTo;
+        this.recipient = recipient;
         this.msg = msg;
     }
 
     public Message(User author, String msg) {
         this.author = author;
         this.msg = msg;
-        this.nickTo = null;
+        this.recipient = null;
     }
 
     public Message(User user) {
         this.author = user;
-        this.nickTo = null;
+        this.recipient = null;
         this.msg = null;
     }
 
     public Message(User user, boolean state) {
         this.author = user;
-        this.nickTo = null;
+        this.recipient = null;
         this.msg = null;
         this.state = state;
     }

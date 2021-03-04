@@ -46,7 +46,7 @@ public class Server {
 
     public void sendPrivateMessage(Message message) throws IOException {
         for (ClientHandler client: clients) {
-            if (message.getNickTo().equals(client.getUser().getNick())
+            if (message.getRecipient().equals(client.getUser().getNick())
                 || message.getAuthor().getNick().equals(client.getUser().getNick())) {
                 client.sendMessage(message);
             }
@@ -54,7 +54,7 @@ public class Server {
         System.out.println("[DEBUG] Client "
             + message.getAuthor().getNick()
             + " send private message to "
-            + message.getNickTo()
+            + message.getRecipient()
         );
     }
 

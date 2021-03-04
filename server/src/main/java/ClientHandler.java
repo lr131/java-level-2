@@ -1,9 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.IntStream;
 
 /**
  * Класс, отвечающий за обмен сообщениями между клиентами и сервером.
@@ -63,7 +61,7 @@ public class ClientHandler implements Runnable {
                     setUser(message.getAuthor());
                     if (message.getMsg().equals("/quit")) {
                         out.writeObject(message);
-                    } else if (!message.getNickTo().isEmpty()) {
+                    } else if (!message.getRecipient().isEmpty()) {
                         server.sendPrivateMessage(message);
                     } else {
                         server.broadCastMessage(message);

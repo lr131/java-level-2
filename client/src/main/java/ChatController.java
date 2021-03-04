@@ -59,7 +59,7 @@ implements Initializable {
                         listView.getItems().add(dateFormatter.format(new Date()));
                         setCurrentDate(new Date());
                     }
-                    String privateLabel = message.getNickTo().isEmpty()
+                    String privateLabel = message.getRecipient().isEmpty()
                             ? ""
                             :" PRIVATE";
                     Platform.runLater(() -> listView.getItems().add(
