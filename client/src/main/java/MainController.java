@@ -9,18 +9,18 @@ public class MainController {
     private static HashMap<String, Parent> controllers;
     private static Network network;
     private static Stage primaryStage;
-    static private String nickName;
+    private static User user;
 
-    public static String getNickName() {
-        return nickName;
+    public static User getUser() {
+        return user;
     }
 
     public static Network getNetwork() {
         return network;
     }
 
-    public static void setNickName(String nickName) {
-        MainController.nickName = nickName;
+    public static void setUser(User user) {
+        MainController.user = user;
     }
 
     public MainController() {
@@ -30,6 +30,7 @@ public class MainController {
         this.controllers = new HashMap<>();
         this.primaryStage = primaryStage;
         network = Network.getInstance();
+        user = null;
     }
 
     public void add(String name, Parent parent)
@@ -50,7 +51,7 @@ public class MainController {
         primaryStage.show();
         primaryStage.setOnCloseRequest(request -> {
             try {
-                network.writeMessage(new MessageDTO(getNickName(), "/quit"));
+                network.writeMessage(new Message(getUser(), "/quit"));
             } catch (IOException e) {
                 e.printStackTrace();
             }

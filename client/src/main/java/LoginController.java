@@ -9,7 +9,6 @@ import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.ResourceBundle;
 
 public class LoginController
@@ -23,12 +22,15 @@ implements Initializable {
     public AnchorPane logWin;
 
     public void login() {
-        //TODO пока заглушка
+        //TODO пока заглушка,  вообще отправить Message(User)
         boolean state = true;
+        setUser(new User(userNameField.getText(),
+                passwordField.getText()));
         if (state) {
             lblStateConn.setText("Login success");
-            setNickName(userNameField.getText());
-            activate("chat", ("Чат " + getNickName()));
+            setUser(new User(userNameField.getText(),
+                    passwordField.getText()));
+            activate("chat", ("Чат " + getUser().getNick()));
         } else {
             lblStateConn.setText("Login failed");
         }

@@ -1,26 +1,28 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Класс, отвечающий за обмен сообщениями между клиентами и сервером.
  */
 public class ClientHandler implements Runnable {
     
-    private Socket socket;
-    private Server server;
+    private final Socket socket;
+    private final Server server;
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private boolean running;
-    private String nickName;
+    private User user;
 
 
-    public String getNickName() {
-        return nickName;
+    public User getUser() {
+        return user;
     }
 
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public ClientHandler(Socket socket, Server server) {
@@ -29,19 +31,17 @@ public class ClientHandler implements Runnable {
         running = true;
     }
 
-    boolean auth(String login, String pass) {
-        HashMap<String, String> data = new HashMap<>();
-        data.put("user1", "1234");
-        data.put("user2", "1234");
-        data.put("user3", "1234");
-        data.put("user4", "1234");
-        if ( data.containsKey(login)
-                && data.getOrDefault(login, "").equals(
-                pass)) {
-            return true;
-        } else {
-            return false;
-        }
+    boolean auth(User user) {
+        List<User> usersMockData = new ArrayList<>();
+        usersMockData.add(new User("user1", "1234"));
+        usersMockData.add(new User("user2", "1234"));
+        usersMockData.add(new User("user3", "1234"));
+        usersMockData.add(new User("user4", "1234"));
+        usersMockData.add(new User("user5", "1234"));
+        usersMockData.add(new User("user6", "1234"));
+        usersMockData.add(new User("user7", "1234"));
+        return usersMockData.contains(user); //TODO или содержит аналогичные
+        // данные, тут подумать
     }
 
     @Override
@@ -51,8 +51,8 @@ public class ClientHandler implements Runnable {
             out = new ObjectOutputStream(socket.getOutputStream());
             System.out.println("[DEBUG] client start processing");
             while (running) {
-                MessageDTO message = (MessageDTO) in.readObject();
-                setNickName(message.getNickFrom());
+                Message message = (Message) in.readObject();
+                setUser(message.getAuthor());
                 if (message.getMsg().equals("/quit")) {
                     out.writeObject(message);
                 } else if (!message.getNickTo().isEmpty()) {
@@ -60,7 +60,7 @@ public class ClientHandler implements Runnable {
                 } else {
                     server.broadCastMessage(message);
                 }
-                System.out.println("[DEBUG] message from client: " + message);
+                System.out.println("[DEBUG] message from client: " + message.getAuthor().getNick());
             }
         } catch (Exception e) {
             System.err.println("Handled connection was broken");
@@ -68,7 +68,7 @@ public class ClientHandler implements Runnable {
         }
     }
     
-    public void sendMessage(MessageDTO message) throws IOException {
+    public void sendMessage(Message message) throws IOException {
         out.writeObject(message);
         out.flush();
     }

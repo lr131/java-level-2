@@ -30,11 +30,11 @@ public class Network {
         }
     }
     
-    public MessageDTO readMessage() throws IOException, ClassNotFoundException {
-        return (MessageDTO) in.readObject();
+    public Message readMessage() throws IOException, ClassNotFoundException {
+        return (Message) in.readObject();
     }
     
-    public void writeMessage(MessageDTO message) throws IOException {
+    public void writeMessage(Message message) throws IOException {
         out.writeObject(message);
         out.flush();
     }

@@ -38,21 +38,21 @@ public class Server {
         System.out.println("[DEBUG] Client removed from broadcast queue.");
     }
 
-    public void broadCastMessage(MessageDTO message) throws IOException {
+    public void broadCastMessage(Message message) throws IOException {
         for (ClientHandler client: clients) {
             client.sendMessage(message);
         }
     }
 
-    public void sendPrivateMessage(MessageDTO message) throws IOException {
+    public void sendPrivateMessage(Message message) throws IOException {
         for (ClientHandler client: clients) {
-            if (message.getNickTo().equals(client.getNickName())
-                || message.getNickFrom().equals(client.getNickName())) {
+            if (message.getNickTo().equals(client.getUser())
+                || message.getAuthor().getNick().equals(client.getUser())) {
                 client.sendMessage(message);
             }
         }
         System.out.println("[DEBUG] Client "
-            + message.getNickFrom()
+            + message.getAuthor().getNick()
             + " send private message to "
             + message.getNickTo()
         );

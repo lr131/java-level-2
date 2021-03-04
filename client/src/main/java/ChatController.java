@@ -48,7 +48,7 @@ implements Initializable {
         new Thread(() -> {
             try {
                 while (true) {
-                    MessageDTO message = network.readMessage();
+                    Message message = network.readMessage();
                     if (message.getMsg().equals("/quit")) {
                         network.close();
                         break;
@@ -65,7 +65,7 @@ implements Initializable {
                     Platform.runLater(() -> listView.getItems().add(
                             String.format("(%s) [%s]%s: %s",
                                     timeFormatter.format(new Date()),
-                                    message.getNickFrom(),
+                                    message.getAuthor().getNick(),
                                     privateLabel,
                                     message.getMsg()
                             )
@@ -96,8 +96,8 @@ implements Initializable {
             msgBody = msgBody.substring(indexMsg);
         }
 
-        network.writeMessage(new MessageDTO(
-                getNickName(),
+        network.writeMessage(new Message(
+                getUser(),
                 address,
                 msgBody)
         );
