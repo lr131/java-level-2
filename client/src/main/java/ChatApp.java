@@ -12,9 +12,9 @@ public class ChatApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent chat = FXMLLoader.load(getClass().getResource("chat.fxml"));
-        Parent login = FXMLLoader.load(getClass().getResource("login.fxml"));
         MainController mainController = new MainController(primaryStage);
+        Parent login = FXMLLoader.load(getClass().getResource("login.fxml"));
+        Parent chat = FXMLLoader.load(getClass().getResource("chat.fxml"));
         mainController.add("login", login);
         mainController.add("chat", chat);
         mainController.activate("login", "Войти");

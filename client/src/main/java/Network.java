@@ -1,7 +1,6 @@
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-import javafx.application.Platform;
-
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class Network {

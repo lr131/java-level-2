@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.HashMap;
 
 /**
  * Класс, отвечающий за обмен сообщениями между клиентами и сервером.
@@ -26,6 +27,21 @@ public class ClientHandler implements Runnable {
         this.socket = socket;
         this.server = server;
         running = true;
+    }
+
+    boolean auth(String login, String pass) {
+        HashMap<String, String> data = new HashMap<>();
+        data.put("user1", "1234");
+        data.put("user2", "1234");
+        data.put("user3", "1234");
+        data.put("user4", "1234");
+        if ( data.containsKey(login)
+                && data.getOrDefault(login, "").equals(
+                pass)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
