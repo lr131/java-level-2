@@ -3,6 +3,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Класс, отвечающий за обмен сообщениями между клиентами и сервером.
@@ -40,8 +41,11 @@ public class ClientHandler implements Runnable {
         usersMockData.add(new User("user5", "1234"));
         usersMockData.add(new User("user6", "1234"));
         usersMockData.add(new User("user7", "1234"));
-        return usersMockData.contains(user); //TODO или содержит аналогичные
-        // данные, тут подумать
+//        return usersMockData.contains(user); //TODO
+        for (User mock: usersMockData) {
+            if (user.equals(mock)) return true;
+        }
+        return false;
     }
 
     @Override
@@ -52,15 +56,20 @@ public class ClientHandler implements Runnable {
             System.out.println("[DEBUG] client start processing");
             while (running) {
                 Message message = (Message) in.readObject();
-                setUser(message.getAuthor());
-                if (message.getMsg().equals("/quit")) {
-                    out.writeObject(message);
-                } else if (!message.getNickTo().isEmpty()) {
-                    server.sendPrivateMessage(message);
+                if (message.getMsg() == null) {
+                    sendMessage(new Message(message.getAuthor(),
+                            auth(message.getAuthor())));
                 } else {
-                    server.broadCastMessage(message);
+                    setUser(message.getAuthor());
+                    if (message.getMsg().equals("/quit")) {
+                        out.writeObject(message);
+                    } else if (!message.getNickTo().isEmpty()) {
+                        server.sendPrivateMessage(message);
+                    } else {
+                        server.broadCastMessage(message);
+                    }
+                    System.out.println("[DEBUG] message from client: " + message.getAuthor().getNick());
                 }
-                System.out.println("[DEBUG] message from client: " + message.getAuthor().getNick());
             }
         } catch (Exception e) {
             System.err.println("Handled connection was broken");

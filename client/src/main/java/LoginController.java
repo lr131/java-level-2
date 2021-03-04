@@ -23,10 +23,15 @@ implements Initializable {
 
     public void login() {
         //TODO пока заглушка,  вообще отправить Message(User)
-        boolean state = true;
+        Message respMessageMock = new Message(
+                new User(userNameField.getText(),
+                        passwordField.getText()),
+                true
+        );
         setUser(new User(userNameField.getText(),
                 passwordField.getText()));
-        if (state) {
+        Message messageAuth = new Message(getUser());
+        if (Boolean.TRUE.equals(respMessageMock.isState())) {
             lblStateConn.setText("Login success");
             setUser(new User(userNameField.getText(),
                     passwordField.getText()));
@@ -34,6 +39,24 @@ implements Initializable {
         } else {
             lblStateConn.setText("Login failed");
         }
+//        try {
+////            network.writeMessage(messageAuth);
+////            Message messageState = network.readMessage();
+//            if (Boolean.TRUE.equals(respMessageMock.isState())) {
+//                lblStateConn.setText("Login success");
+//                setUser(new User(userNameField.getText(),
+//                        passwordField.getText()));
+//                activate("chat", ("Чат " + getUser().getNick()));
+//            } else {
+//                lblStateConn.setText("Login failed");
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            System.err.println("Не получилось отправить сообщение");
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//            System.err.println("Не получилось прочитать сообщение");
+//        }
     }
     public void loginButton(ActionEvent actionEvent) throws IOException {
         login();

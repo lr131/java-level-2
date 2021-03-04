@@ -4,7 +4,7 @@ public class Message implements Serializable {
     private final User author;
     private final String nickTo;
     private final String msg;
-    private final Boolean state = null;
+    private Boolean state = null;
 
     public Boolean isState() {
         return state;
@@ -38,6 +38,13 @@ public class Message implements Serializable {
         this.author = user;
         this.nickTo = null;
         this.msg = null;
+    }
+
+    public Message(User user, boolean state) {
+        this.author = user;
+        this.nickTo = null;
+        this.msg = null;
+        this.state = state;
     }
 
 }
