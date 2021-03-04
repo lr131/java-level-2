@@ -17,14 +17,15 @@ public class ClientHandler implements Runnable {
     public String getNickName() {
         return nickName;
     }
-    private static int cnt = 0;
-    
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
     public ClientHandler(Socket socket, Server server) {
         this.socket = socket;
         this.server = server;
         running = true;
-        cnt++;
-        nickName = "user" + cnt;
     }
 
     @Override
@@ -34,12 +35,8 @@ public class ClientHandler implements Runnable {
             out = new ObjectOutputStream(socket.getOutputStream());
             System.out.println("[DEBUG] client start processing");
             while (running) {
-                MessageDTO msgObj = (MessageDTO) in.readObject();
-                MessageDTO message = new MessageDTO(
-                    nickName,
-                    msgObj.getNickTo(),
-                    msgObj.getMsg()
-                );
+                MessageDTO message = (MessageDTO) in.readObject();
+                setNickName(message.getNickFrom());
                 if (message.getMsg().equals("/quit")) {
                     out.writeObject(message);
                 } else if (!message.getNickTo().isEmpty()) {

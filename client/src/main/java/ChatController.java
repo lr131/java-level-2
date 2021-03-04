@@ -104,7 +104,7 @@ implements Initializable {
         }
 
         network.writeMessage(new MessageDTO(
-                "client nick",
+                getNickName(),
                 address,
                 msgBody)
         );

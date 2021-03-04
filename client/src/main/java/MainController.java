@@ -1,17 +1,27 @@
-import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
-import java.util.ResourceBundle;
 
 public class MainController {
     private static HashMap<String, Parent> controllers;
     private static Network network;
     private static Stage primaryStage;
+    static private String nickName;
+
+    public static String getNickName() {
+        return nickName;
+    }
+
+    public static Network getNetwork() {
+        return network;
+    }
+
+    public static void setNickName(String nickName) {
+        MainController.nickName = nickName;
+    }
 
     public MainController() {
     }
@@ -31,16 +41,16 @@ public class MainController {
         return controllers.getOrDefault(name, null);
     }
 
-    public void activate(String name)
+    public void activate(String name, String title)
     {
         Parent parent = controllers.get(name);
         primaryStage.setScene(new Scene(parent));
-        primaryStage.setTitle(name);
+        primaryStage.setTitle(title);
         primaryStage.setResizable(false);
         primaryStage.show();
         primaryStage.setOnCloseRequest(request -> {
             try {
-                network.writeMessage(new MessageDTO("", "/quit"));
+                network.writeMessage(new MessageDTO(getNickName(), "/quit"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
