@@ -1,8 +1,6 @@
-import javafx.application.Platform;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class Network {
@@ -10,8 +8,8 @@ public class Network {
     private static final int PORT = 8189;
     
     private Socket socket;
-    private DataInputStream in;
-    private DataOutputStream out;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
 
     private static Network instance;
 
@@ -25,19 +23,19 @@ public class Network {
     private Network() {
         try {
             socket = new Socket("localhost", PORT);
-            out = new DataOutputStream(socket.getOutputStream());
-            in = new DataInputStream(socket.getInputStream());
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
         } catch (Exception e) {
             System.err.println("Problem with server on port " + PORT);
         }
     }
     
-    public String readMessage() throws IOException {
-        return in.readUTF();
+    public Message readMessage() throws IOException, ClassNotFoundException {
+        return (Message) in.readObject();
     }
     
-    public void writeMessage(String message) throws IOException {
-        out.writeUTF(message);
+    public void writeMessage(Message message) throws IOException {
+        out.writeObject(message);
         out.flush();
     }
     

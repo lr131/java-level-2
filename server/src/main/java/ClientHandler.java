@@ -1,43 +1,73 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Класс, отвечающий за обмен сообщениями между клиентами и сервером.
  */
 public class ClientHandler implements Runnable {
     
-    private Socket socket;
-    private Server server;
-    private DataInputStream in;
-    private DataOutputStream out;
+    private final Socket socket;
+    private final Server server;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
     private boolean running;
-    private String nickName;
-    private static int cnt = 0;
-    
+    private User user;
+
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public ClientHandler(Socket socket, Server server) {
         this.socket = socket;
         this.server = server;
         running = true;
-        cnt++;
-        nickName = "user" + cnt;
+    }
+
+    boolean auth(User user) {
+        List<User> usersMockData = new ArrayList<>();
+        usersMockData.add(new User("user1", "1234"));
+        usersMockData.add(new User("user2", "1234"));
+        usersMockData.add(new User("user3", "1234"));
+        usersMockData.add(new User("user4", "1234"));
+        usersMockData.add(new User("user5", "1234"));
+        usersMockData.add(new User("user6", "1234"));
+        usersMockData.add(new User("user7", "1234"));
+//        return usersMockData.contains(user); //TODO
+        for (User mock: usersMockData) {
+            if (user.equals(mock)) return true;
+        }
+        return false;
     }
 
     @Override
     public void run() {
         try {
-            out = new DataOutputStream(socket.getOutputStream());
-            in = new DataInputStream(socket.getInputStream());
+            in = new ObjectInputStream(socket.getInputStream());
+            out = new ObjectOutputStream(socket.getOutputStream());
             System.out.println("[DEBUG] client start processing");
             while (running) {
-                String message = in.readUTF();
-                if (message.equals("/quit")) {
-                    out.writeUTF(message);
+                Message message = (Message) in.readObject();
+                if (message.getMsg() == null) {
+                    sendMessage(new Message(message.getAuthor(),
+                            auth(message.getAuthor())));
                 } else {
-                    server.broadCastMessage("[" + nickName + "]: " + message);
+                    setUser(message.getAuthor());
+                    if (message.getMsg().equals("/quit")) {
+                        out.writeObject(message);
+                    } else if (!message.getRecipient().isEmpty()) {
+                        server.sendPrivateMessage(message);
+                    } else {
+                        server.broadCastMessage(message);
+                    }
+                    System.out.println("[DEBUG] message from client: " + message.getAuthor().getNick());
                 }
-                System.out.println("[DEBUG] message from client: " + message);
             }
         } catch (Exception e) {
             System.err.println("Handled connection was broken");
@@ -45,8 +75,8 @@ public class ClientHandler implements Runnable {
         }
     }
     
-    public void sendMessage(String message) throws IOException {
-        out.writeUTF(message);
+    public void sendMessage(Message message) throws IOException {
+        out.writeObject(message);
         out.flush();
     }
 }

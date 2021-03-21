@@ -15,8 +15,10 @@ import java.util.Date;
 import java.util.ResourceBundle;
 
 
-public class ChatController implements Initializable {
-    
+public class ChatController
+extends MainController
+implements Initializable {
+
     private Network network;
     public TextField messageField;
     public ListView<String> listView;
@@ -42,21 +44,39 @@ public class ChatController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //TODO всё, что здесь, перенести в отдельный метод типа "коннект", привязать к кнопке
         network = Network.getInstance();
         new Thread(() -> {
             try {
                 while (true) {
-                    String message = network.readMessage();
-                    if (message.equals("/quit")) {
+                    Message message = network.readMessage();
+                    if (message.getMsg().equals("/quit")) {
                         network.close();
                         break;
                     }
-                    Platform.runLater(() -> listView.getItems().add(message));
+                    if (listView.getItems().size() == 0 || isNewDay(new Date())) {
+                        //если переписка только началась, то помечаем начало переписки
+                        // или если в процессе переписки наступили новые сутки
+                        listView.getItems().add(dateFormatter.format(new Date()));
+                        setCurrentDate(new Date());
+                    }
+                    String privateLabel = message.getRecipient().isEmpty()
+                            ? ""
+                            :" PRIVATE";
+                    Platform.runLater(() -> listView.getItems().add(
+                            String.format("(%s) [%s]%s: %s",
+                                    timeFormatter.format(new Date()),
+                                    message.getAuthor().getNick(),
+                                    privateLabel,
+                                    message.getMsg()
+                            )
+                        )
+                    );
                 }
             } catch (IOException e) {
                 System.err.println("Server was broke");
                 Platform.runLater(() -> listView.getItems().add("Server was broke"));
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             }
         }).start();
     }
@@ -68,15 +88,19 @@ public class ChatController implements Initializable {
     private void send() throws IOException {
         Date date = new Date();
         ObservableList<String> historyItems = listView.getItems();
-        //TODO
-        if (historyItems.size() == 0 || isNewDay(date)) {
-            //если переписка только началась, то помечаем начало переписки
-            // или если в процессе переписки наступили новые сутки
-            network.writeMessage(dateFormatter.format(date));
-            setCurrentDate(date);
+        String address = "";
+        String msgBody = messageField.getText();
+        if (msgBody.startsWith("/w ")) {
+            address = msgBody.split(" ")[1];
+            int indexMsg = msgBody.indexOf(address) + address.length() + 1;
+            msgBody = msgBody.substring(indexMsg);
         }
-        String prefixMsg = "(" + timeFormatter.format(date) + "): ";
-        network.writeMessage(prefixMsg + messageField.getText());
+
+        network.writeMessage(new Message(
+                getUser(),
+                address,
+                msgBody)
+        );
         messageField.clear();
     }
 
@@ -89,6 +113,10 @@ public class ChatController implements Initializable {
      */
     private boolean isNewDay(Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+        //TODO потом поправить
+        if (currentDate == null) {
+            currentDate = new Date();
+        }
         String currentDateStr = formatter.format(currentDate);
         String newDateStr = formatter.format(date);
 
